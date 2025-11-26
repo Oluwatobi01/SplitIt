@@ -1,0 +1,7 @@
+{
+  "name": "SplitIt",
+  "description": "A bill splitting application with dark mode support, receipt scanning, and expense tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
