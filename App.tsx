@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 
 import Dashboard from './pages/Dashboard';
@@ -210,9 +210,9 @@ const App: React.FC = () => {
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       <AuthContext.Provider value={{ session, user: currentUser, loading: authLoading, signOut: handleSignOut }}>
         <BillsContext.Provider value={{ bills, addBill, users, currentUser: safeCurrentUser }}>
-            <HashRouter>
+            <BrowserRouter>
                {dbSetupRequired ? <DbSetup /> : <AppContent />}
-            </HashRouter>
+            </BrowserRouter>
         </BillsContext.Provider>
       </AuthContext.Provider>
     </ThemeContext.Provider>

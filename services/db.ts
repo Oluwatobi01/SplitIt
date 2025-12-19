@@ -7,26 +7,26 @@ import { MOCK_USERS, CURRENT_USER } from '../data';
  * Maps Supabase DB response to our UI Bill interface
  */
 const mapDbBillToUi = (dbBill: any): Bill => {
-  // Map participants from the join
-  const participants = dbBill.bill_participants.map((bp: any) => ({
-    userId: bp.user.id,
-    name: bp.user.name,
-    img: bp.user.img,
-    amount: parseFloat(bp.amount),
+  // Map participants from the join safely
+  const participants = (dbBill.bill_participants || []).map((bp: any) => ({
+    userId: bp.user?.id || 'unknown',
+    name: bp.user?.name || 'Unknown User',
+    img: bp.user?.img || '',
+    amount: parseFloat(bp.amount || '0'),
     paid: bp.paid
   }));
 
   // Map receipt items
-  const receiptItems = dbBill.receipt_items?.map((ri: any) => ({
+  const receiptItems = (dbBill.receipt_items || []).map((ri: any) => ({
     name: ri.name,
-    price: parseFloat(ri.price)
+    price: parseFloat(ri.price || '0')
   })) || [];
 
   return {
     id: dbBill.id,
     title: dbBill.title,
-    amount: parseFloat(dbBill.amount),
-    description: dbBill.description,
+    amount: parseFloat(dbBill.amount || '0'),
+    description: dbBill.description || '',
     date: dbBill.date,
     status: dbBill.status,
     category: dbBill.category,
@@ -93,7 +93,7 @@ export const fetchBills = async () => {
     return [];
   }
 
-  return data.map(mapDbBillToUi);
+  return (data || []).map(mapDbBillToUi);
 };
 
 /**
@@ -105,7 +105,7 @@ export const fetchUsers = async (): Promise<User[]> => {
         console.error("Error fetching users", error);
         return [];
     }
-    return data as User[];
+    return (data || []) as User[];
 };
 
 /**
@@ -192,15 +192,15 @@ export const fetchUserGroups = async (userId: string): Promise<Group[]> => {
         return [];
     }
 
-    return data.map((item: any) => ({
-        id: item.group.id,
-        name: item.group.name,
-        created_by: item.group.created_by,
-        img: item.group.img,
+    return (data || []).map((item: any) => ({
+        id: item.group?.id,
+        name: item.group?.name || 'Unnamed Group',
+        created_by: item.group?.created_by,
+        img: item.group?.img,
         members: [], // We don't load full member details in list view for perf
         total_owe: 0, // Simplified for now
         total_owed: 0,
-        member_count: item.group.group_members[0].count // Supabase count
+        member_count: item.group?.group_members?.[0]?.count || 1
     }));
 };
 
@@ -223,7 +223,7 @@ export const fetchGroupDetails = async (groupId: string): Promise<Group | null> 
         name: data.name,
         created_by: data.created_by,
         img: data.img,
-        members: data.group_members.map((gm: any) => gm.user)
+        members: (data.group_members || []).map((gm: any) => gm.user).filter((u: any) => !!u)
     };
 };
 
